@@ -21,7 +21,7 @@ class RemoveCommandTest extends AbstractCommandTest
     /**
      * Test scheduler:remove with given command name.
      */
-    public function testRemove()
+    public function testRemove(): void
     {
         // DataFixtures create 4 records
         $this->loadScheduledCommandFixtures();
@@ -49,8 +49,9 @@ class RemoveCommandTest extends AbstractCommandTest
 
     /**
      * @dataProvider provideCompletionSuggestions
+     * @param array<string, mixed> $input
      */
-    public function testComplete(array $input, array $expectedSuggestions)
+    public function testComplete(array $input, array $expectedSuggestions): void
     {
         $cmd = static::getContainer()->get(RemoveCommand::class);
         $cmd->setApplication(new \Symfony\Component\Console\Application('Test'));
@@ -63,11 +64,6 @@ class RemoveCommandTest extends AbstractCommandTest
 
     public function provideCompletionSuggestions(): \Generator
     {
-        /*yield 'name' => [
-            ['CommandTestT'],
-            ['CommandTestThree']
-        ];*/
-
         yield 'name' => [
             ['CommandTestT'],
             ['CommandTestOne', 'CommandTestFour', 'CommandTestFive', 'CommandTestThree']
@@ -83,7 +79,6 @@ class RemoveCommandTest extends AbstractCommandTest
 
         $kernel = $this->createMock(KernelInterface::class);
         $kernel
-            ->expects($this->any())
             ->method('getContainer')
             ->willReturn($container);
 

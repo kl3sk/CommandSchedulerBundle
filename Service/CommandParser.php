@@ -17,6 +17,10 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class CommandParser
 {
+    /**
+     * @param string[] $excludedNamespaces
+     * @param string[] $includedNamespaces
+     */
     public function __construct(private KernelInterface $kernel,
         private array $excludedNamespaces = [],
         private array $includedNamespaces = [])
@@ -29,6 +33,9 @@ class CommandParser
 
     /**
      * There could be only whitelisting or blacklisting
+     *
+     * @param string[] $excludedNamespaces
+     * @param string[] $includedNamespaces
      */
     public function isNamespacingValid(array $excludedNamespaces, array $includedNamespaces): bool
     {
@@ -69,7 +76,7 @@ class CommandParser
 
         try {
             Debug::enable();
-            $output = new StreamOutput(fopen('php://memory', 'w+'));
+            $output = new StreamOutput(fopen('php://memory', 'wb+'));
             $application->run($input, $output);
 
             rewind($output->getStream());
@@ -87,14 +94,14 @@ class CommandParser
 
             throw new \InvalidArgumentException('Only xml and json are allowed');
         } catch (\Throwable) {
-            throw new Exception('Listing of commands could not be read');
+            throw new \RuntimeException('Listing of commands could not be read');
         }
     }
 
     /**
      * Execute the console command "list" and parse the output to have all available command.
      *
-     * @return array[] ["Namespace1" => ["Command1", "Command2"]]
+     * @return array<string, string[]> ["Namespace1" => ["Command1", "Command2"]]
      *
      * @throws Exception
      */
@@ -111,6 +118,7 @@ class CommandParser
     /**
      * Get Details for the commands, for the allowed Namespaces
      *
+     * @return array<string, array<string, mixed>>
      * @throws Exception
      */
     public function getAllowedCommandDetails(string $env="prod"): array
@@ -122,6 +130,9 @@ class CommandParser
 
     /**
      * Is the command-List wrapped in namespaces?
+     *
+     * @param array<string, array<string, string>> $commands
+     * @return string[]
      */
     public function reduceNamespacedCommands(array $commands): array
     {
@@ -148,9 +159,13 @@ class CommandParser
         return $commands;
     }
 
+    /**
+     * @return array<string, array<string, mixed>>
+     * @throws Exception
+     */
     public function getCommandDetails(array $commands): array
     {
-        $availableCommands = $this->getAvailableCommands("json", "prod");
+        $availableCommands = $this->getAvailableCommands("json");
         $result = [];
         #$command->getDefinition();
 
@@ -160,7 +175,7 @@ class CommandParser
         foreach ($availableCommands["commands"] as $command)
         {
             #var_dump($command);
-            if(in_array($command["name"], $commands))
+            if(in_array($command["name"], $commands, true))
             {
                 $result[$command["name"]] = $command;
             }
@@ -178,7 +193,8 @@ class CommandParser
     /**
      * Extract an array of available Symfony commands from the JSON output.
      *
-     * @param array $commands
+     * @param array<string, array<int, mixed>> $commands
+     * @return array<string, array<int|string, mixed>|string>
      * ["namespaces]
      *  [0]
      *     ["id"] => cache
@@ -197,9 +213,9 @@ class CommandParser
                 $namespaceId = (string) $namespace["id"];
 
                 # Blacklisting and Whitelisting
-                if ((count($this->excludedNamespaces) > 0 && in_array($namespaceId, $this->excludedNamespaces))
+                if ((count($this->excludedNamespaces) > 0 && in_array($namespaceId, $this->excludedNamespaces, true))
                     ||
-                    (count($this->includedNamespaces) > 0 && !in_array($namespaceId, $this->includedNamespaces))
+                    (count($this->includedNamespaces) > 0 && !in_array($namespaceId, $this->includedNamespaces, true))
                 ) {
                     continue;
                 }
