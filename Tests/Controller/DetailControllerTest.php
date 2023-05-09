@@ -59,6 +59,9 @@ class DetailControllerTest extends WebTestCase
             'command_scheduler_detail[logFile]' => 'one.log',
             'command_scheduler_detail[priority]' => '100',
             'command_scheduler_detail[save]' => '',
+            'command_scheduler_detail[pingBackUrl]' => '',
+            'command_scheduler_detail[pingBackFailedUrl]' => '',
+            'command_scheduler_detail[notes]' => ''
         ];
 
         $this->assertEquals($fixtureSet, $form->getValues());

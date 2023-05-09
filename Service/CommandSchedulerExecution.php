@@ -143,6 +143,7 @@ class CommandSchedulerExecution
         try {
             $this->eventDispatcher->dispatch(new SchedulerCommandPreExecutionEvent($scheduledCommand));
 
+            $command->ignoreValidationErrors();
             $result = $command->run($input, $logOutput);
 
             $this->em->clear();
@@ -150,6 +151,7 @@ class CommandSchedulerExecution
             $exception = $e;
             $logOutput->writeln($e->getMessage());
             $logOutput->writeln($e->getTraceAsString());
+
             $result = -1;
         } finally {
             $endRun = new \DateTimeImmutable();

@@ -45,6 +45,9 @@
                 {{ form_row( scheduledCommandForm.command, {'attr': {'class': 'form-control select2'} } ) }}
                 {{ form_row( scheduledCommandForm.arguments, {'attr': styleConfiguration|merge({'placeholder': '--argument1=foo --bar'}) } ) }}
                 {{ form_row( scheduledCommandForm.cronExpression, {'attr': styleConfiguration|merge({'placeholder': '*/10 * * * *'}) } ) }}
+                {{ form_row( scheduledCommandForm.pingBackUrl ) }}
+                {{ form_row( scheduledCommandForm.pingBackFailedUrl ) }}
+                {{ form_row( scheduledCommandForm.notes ) }}
             </div>
         </div>
         </div>

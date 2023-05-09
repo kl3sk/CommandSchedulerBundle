@@ -123,6 +123,18 @@
                 <source>detail.locked</source>
                 <target>Bloqueado</target>
             </trans-unit>
+            <trans-unit id="216">
+                <source>detail.pingBackUrl</source>
+                <target>PingBackUrl</target>
+            </trans-unit>
+            <trans-unit id="217">
+                 <source>detail.pingBackFailedUrl</source>
+                 <target>PingBackFailedUrl</target>
+            </trans-unit>
+            <trans-unit id="218">
+                 <source>detail.notes</source>
+                 <target>notes</target>
+            </trans-unit>
 
             <!-- Flashs messages -->
             <trans-unit id="300">
