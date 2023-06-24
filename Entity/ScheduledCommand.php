@@ -279,16 +279,7 @@ class ScheduledCommand
             return new DateTime();
         }
 
-        $cron = new CronExpressionLib($this->getCronExpression());
-
-        if ($this->getLastExecution() === null) {
-            if ($cron->isDue()) {
-                return new \DateTime('now');
-            }
-            return null;
-        }
-
-        return $cron->getNextRunDate($this->getLastExecution());
+        return (new CronExpressionLib($this->getCronExpression()))->getNextRunDate();
     }
 
     /**
