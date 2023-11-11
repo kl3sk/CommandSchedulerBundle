@@ -7,7 +7,9 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -90,6 +92,34 @@ class ScheduledCommandType extends AbstractType
             [
                 'label' => 'detail.disabled',
                 'required' => false,
+            ]
+        );
+
+        $builder->add(
+            'pingBackUrl',
+            UrlType::class,
+            [
+                'label' => 'detail.pingBackUrl',
+                'required' => false,
+            ]
+        );
+
+        $builder->add(
+            'pingBackFailedUrl',
+            UrlType::class,
+            [
+                'label' => 'detail.pingBackFailedUrl',
+                'required' => false,
+            ]
+        );
+
+        $builder->add(
+            'notes',
+            TextareaType::class,
+            [
+                'label' => 'detail.notes',
+                'required' => false,
+                'empty_data' => ''
             ]
         );
 

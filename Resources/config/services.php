@@ -173,14 +173,22 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     {$notifier = service('notifier');}
     else { $notifier = null; }
 
+    if(class_exists(\Symfony\Contracts\HttpClient\HttpClientInterface::class))
+    {$httpClient = service('http_client');}
+    else { $httpClient = null; }
+
     $services->set(SchedulerCommandSubscriber::class)
         ->args(
             [
                 service('logger'),
                 service('doctrine.orm.default_entity_manager'),
                 $notifier,
+                $httpClient,
                 '%dukecity_command_scheduler.monitor_mail%',
                 '%dukecity_command_scheduler.monitor_mail_subject%',
+                '%dukecity_command_scheduler.ping_back_provider%',
+                '%dukecity_command_scheduler.ping_back%',
+                '%dukecity_command_scheduler.ping_back_failed%',
             ]
         )
         ->tag('kernel.event_subscriber');

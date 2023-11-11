@@ -12,6 +12,8 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Notifier\NotifierInterface;
 use Symfony\Component\Notifier\Recipient\Recipient;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Component\HttpClient\HttpClient;
 
 class SchedulerCommandSubscriber implements EventSubscriberInterface
 {
@@ -20,10 +22,16 @@ class SchedulerCommandSubscriber implements EventSubscriberInterface
      */
     public function __construct(protected LoggerInterface        $logger,
                                 protected EntityManagerInterface $em,
+                                protected HttpClientInterface|null $httpClient = null,
                                 protected NotifierInterface|null $notifier = null,
                                 private array                    $monitor_mail = [],
-                                private string                   $monitor_mail_subject = 'CronMonitor:')
+                                private string                   $monitor_mail_subject = 'CronMonitor:',
+                                private ?string                  $ping_back_provider = null,
+                                private bool                     $ping_back = true,
+                                private bool                     $ping_back_failed = true
+                                )
     {
+        $this->httpClient = $httpClient ?: HttpClient::create();
     }
 
     /**
@@ -52,14 +60,14 @@ class SchedulerCommandSubscriber implements EventSubscriberInterface
         {
             //...$this->notifier->getAdminRecipients()
             $recipients = [];
-            foreach ($this->monitor_mail as $mailadress) {
-                $recipients[] = new Recipient($mailadress);
+            foreach ($this->monitor_mail as $mailaddress) {
+                $recipients[] = new Recipient($mailaddress);
             }
 
             $this->notifier->send(new CronMonitorNotification($event->getFailedCommands(), $this->monitor_mail_subject), ...$recipients);
         }
 
-        //$this->logger->warning('SchedulerCommandFailedEvent', ['details' => $event->getMessage()]);
+        $this->logger->warning('SchedulerCommandFailedEvent', ['details' => $event->getMessage()]);
     }
 
     public function onScheduledCommandPreExecution(SchedulerCommandPreExecutionEvent $event): void
@@ -71,6 +79,48 @@ class SchedulerCommandSubscriber implements EventSubscriberInterface
     public function onScheduledCommandPostExecution(SchedulerCommandPostExecutionEvent $event): void
     {
         #var_dump('ScheduledCommandPostExecution');
+
+        # success?
+        if($event->getResult() === 0)
+        {
+            $pingBackUrl = $event->getCommand()->getPingBackUrl();
+            $check = $this->ping_back;
+        }
+        else
+        {
+            $pingBackUrl = $event->getCommand()->getPingBackFailedUrl();
+            $check = $this->ping_back_failed;
+        }
+
+        # pingBack
+        if($check && $this->httpClient && $pingBackUrl)
+        {
+            try{
+                $response = $this->httpClient->request("POST", $pingBackUrl);
+
+                if($response->getStatusCode() === 200)
+                {
+                    # correct
+                    $this->logger->debug('ScheduledCommand: PingBack success', [
+                        'name' => $event->getCommand()->getName(),
+                        'pingBackUrl' => $pingBackUrl,
+                    ]);
+                }
+                else
+                {
+                    $this->logger->error('ScheduledCommand: PingBack failed', [
+                        'name' => $event->getCommand()->getName(),
+                        'pingBackUrl' => $pingBackUrl,
+                        'statusCode' => $response->getStatusCode()
+                    ]);
+                }
+            }
+            catch (\Exception $e)
+            {
+                # PingBackFailed
+                $this->logger->error('ScheduledCommand: PingBack failed', ['name' => $event->getCommand()->getName()]);
+            }
+        }
 
         $this->logger->info('ScheduledCommandPostExecution', [
             'name' => $event->getCommand()->getName(),

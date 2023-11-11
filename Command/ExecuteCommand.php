@@ -93,7 +93,6 @@ HELP
             $this->env = "test";
         }
 
-
         // Store the original verbosity before apply the quiet parameter
         $this->commandsVerbosity = $this->output->getVerbosity();
 
@@ -175,20 +174,20 @@ HELP
             $progress->setMessage('Start');
             $progress->start($amountCommands);
 
-                foreach ($commandsToExecute as $command) {
+            foreach ($commandsToExecute as $command)
+            {
+                $progress->setMessage('Start Execution of '.$command->getCommand().' '.$command->getArguments());
+                $io->comment('Start Execution of '.$command->getCommand().' '.$command->getArguments());
 
-                    $progress->setMessage('Start Execution of '.$command->getCommand().' '.$command->getArguments());
-                    $io->comment('Start Execution of '.$command->getCommand().' '.$command->getArguments());
-
-                    $result = $this->commandSchedulerExecution->executeCommand($command, $this->env, $this->commandsVerbosity);
+                $result = $this->commandSchedulerExecution->executeCommand($command, $this->env, $this->commandsVerbosity);
 
                 if($result===0)
                 {$io->success($command->getName().': '.$command->getCommand().' '.$command->getArguments());}
                 else
                 {$io->error($command->getName().': ERROR '.$result.': '.$command->getCommand().' '.$command->getArguments());}
 
-                    $progress->advance();
-                }
+                $progress->advance();
+            }
 
             $progress->finish();
 

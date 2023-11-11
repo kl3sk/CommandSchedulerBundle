@@ -13,7 +13,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Dukecity\CommandSchedulerBundle\Validator\Constraints as AssertDukecity;
 
 /**
- * https://www.doctrine-project.org/2021/05/24/orm2.9.html
  * @author  Julien Guyon <julienguyon@hotmail.com>
  */
 #[ORM\Entity(repositoryClass: ScheduledCommandRepository::class)]
@@ -50,7 +49,7 @@ class ScheduledCommand
     #[Assert\NotBlank]
     #[AssertDukecity\CronExpression]
     #[ORM\Column(type: Types::STRING, length: 200, nullable: true)]
-    private string $cronExpression;
+    private string $cronExpression = "";
 
     #[Assert\Type(DateTime::class)]
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
@@ -65,7 +64,7 @@ class ScheduledCommand
 
     ##[Assert\Type(Integer::class)]
     #[ORM\Column(type: Types::INTEGER, nullable: false)]
-    private int $priority;
+    private int $priority = 0;
 
     /** If true, command will be execute next time regardless cron expression. */
     #[ORM\Column(type: Types::BOOLEAN, nullable: false)]
@@ -77,16 +76,23 @@ class ScheduledCommand
     #[ORM\Column(type: Types::BOOLEAN, nullable: false)]
     private bool $locked = false;
 
+    #[Assert\Url]
+    #[ORM\Column(type: Types::STRING, nullable: true)]
+    private ?string $pingBackUrl = null;
+
+    #[Assert\Url]
+    #[ORM\Column(type: Types::STRING, nullable: true)]
+    private ?string $pingBackFailedUrl = null;
+
+    #[ORM\Column(type: Types::TEXT, options: ['default' => ''])]
+    private string $notes = '';
+
     /**
      * Init new ScheduledCommand.
      */
     public function __construct()
     {
         $this->createdAt = new DateTime();
-        #$this->setLastExecution(new DateTime());
-        $this->lastExecution = null;
-        $this->setLocked(false);
-        $this->priority = 0;
         $this->version = 1;
     }
 
@@ -267,6 +273,42 @@ class ScheduledCommand
         return $this;
     }
 
+    public function getPingBackUrl(): ?string
+    {
+        return $this->pingBackUrl;
+    }
+
+    public function setPingBackUrl(?string $pingBackUrl): ScheduledCommand
+    {
+        $this->pingBackUrl = $pingBackUrl;
+
+        return $this;
+    }
+
+    public function getPingBackFailedUrl(): ?string
+    {
+        return $this->pingBackFailedUrl;
+    }
+
+    public function setPingBackFailedUrl(?string $pingBackFailedUrl): ScheduledCommand
+    {
+        $this->pingBackFailedUrl = $pingBackFailedUrl;
+
+        return $this;
+    }
+
+    public function getNotes(): string
+    {
+        return $this->notes;
+    }
+
+    public function setNotes(string $notes): ScheduledCommand
+    {
+        $this->notes = $notes;
+
+        return $this;
+    }
+
     /**
      * @throws \Exception
      */
@@ -295,4 +337,5 @@ class ScheduledCommand
 
         return null;
     }
+
 }
