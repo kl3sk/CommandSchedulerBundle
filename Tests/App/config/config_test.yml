@@ -21,9 +21,6 @@ framework:
         enabled: false
         collect: false
 
-
-#liip_functional_test: ~
-
 doctrine:
     dbal:
         driver:   pdo_sqlite
@@ -36,6 +33,7 @@ doctrine:
         auto_generate_proxy_classes: true
         auto_mapping: false
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
+        enable_lazy_ghost_objects: true
         mappings:
             # added for type: "attribute"
             Dukecity\CommandSchedulerBundle:
@@ -49,9 +47,6 @@ dukecity_command_scheduler:
     lock_timeout: 300
     excluded_command_namespaces:
         - scheduler
-
-#liip_functional_test:
-#    command_decoration: false
 
 liip_test_fixtures:
     cache_db:

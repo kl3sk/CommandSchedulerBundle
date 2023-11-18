@@ -1,44 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!-- https://phpunit.readthedocs.io/en/latest/configuration.html -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
          colors="true"
-         bootstrap="Tests/bootstrap.php"
-  >
-  <php>
-    <ini name="error_reporting" value="-1" />
-    <server name="APP_ENV" value="test" force="true" />
-    <server name="SHELL_VERBOSITY" value="-1" />
-    <server name="SYMFONY_PHPUNIT_REMOVE" value="" />
-    <!-- <server name="SYMFONY_PHPUNIT_VERSION" value="9" /> -->
+         bootstrap="Tests/bootstrap.php">
 
+  <php>
+    <ini name="error_reporting" value="-1"/>
+    <server name="APP_ENV" value="test" force="true"/>
+    <server name="SHELL_VERBOSITY" value="-1"/>
+    <server name="SYMFONY_PHPUNIT_REMOVE" value=""/>
+    <!-- <server name="SYMFONY_PHPUNIT_VERSION" value="10" /> -->
     <server name="KERNEL_CLASS" value="App\Tests\App\AppKernel"/>
     <server name="KERNEL_DIR" value="./Tests/App"/>
     <ini name="zend.enable_gc" value="0"/>
   </php>
 
   <coverage>
-    <include>
-      <directory suffix=".php">./Command</directory>
-      <directory suffix=".php">./Controller</directory>
-      <directory suffix=".php">./DependencyInjection</directory>
-      <directory suffix=".php">./Entity</directory>
-      <directory suffix=".php">./Event</directory>
-      <directory suffix=".php">./EventSubscriber</directory>
-      <directory suffix=".php">./Form</directory>
-      <directory suffix=".php">./Notification</directory>
-      <directory suffix=".php">./Resources/config</directory>
-      <directory suffix=".php">./Service</directory>
-      <directory suffix=".php">./Validator</directory>
-    </include>
-    <exclude>
-      <directory>./github</directory>
-      <directory>./build</directory>
-      <directory>./Resources/doc/integrations</directory>
-      <directory>./Tests</directory>
-      <directory>./vendor</directory>
-    </exclude>
     <report>
       <clover outputFile="build/logs/clover.xml"/>
     </report>
@@ -51,4 +29,28 @@
   </testsuites>
 
   <logging/>
+
+  <source>
+    <include>
+      <directory>./Command</directory>
+      <directory>./Controller</directory>
+      <directory>./DependencyInjection</directory>
+      <directory>./Entity</directory>
+      <directory>./Event</directory>
+      <directory>./EventSubscriber</directory>
+      <directory>./Form</directory>
+      <directory>./Notification</directory>
+      <directory>./Resources/config</directory>
+      <directory>./Service</directory>
+      <directory>./Validator</directory>
+    </include>
+    <exclude>
+      <directory>./github</directory>
+      <directory>./build</directory>
+      <directory>./Resources/doc/integrations</directory>
+      <directory>./Tests</directory>
+      <directory>./vendor</directory>
+    </exclude>
+  </source>
+
 </phpunit>
